@@ -1,6 +1,20 @@
 import { quat, vec3, mat4 } from "gl-matrix"
 import { Model } from "./Cube"
 
+/* Next Steps:
+    - Add lighting to the shader (will need cube normals)
+        - class changes, new uniforms for light
+        - possibly abstract shader program
+
+    - Add texture to the shader (will need texCoords and cube normals)
+        - same as above, figure out texture stuff again
+
+    - Add an object hierarchy
+        - every object has a parent Object3D and a list of children
+        - parent Object3D can be null
+        - a parent will call render for all of its children, propagating its model matrix down
+*/
+
 export class Object3D {
     private gl: WebGL2RenderingContext
     private shaderProgram: WebGLProgram
@@ -78,7 +92,7 @@ export class Object3D {
 
         // set up object transformations
         const modelMatrix = this.getModelMatrix()
-        
+
         // Get uniform locations
         const modelMatrixUniformLocation = gl.getUniformLocation(this.shaderProgram, 'uModelMatrix')
         const viewMatrixLocation = gl.getUniformLocation(this.shaderProgram, 'uViewMatrix')

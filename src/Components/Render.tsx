@@ -75,6 +75,7 @@ const Render: React.FC<RenderProps> = ({loading}: RenderProps) => {
 
             const newRotation = cubeObject3D.getRotation()
             quat.rotateY(newRotation, newRotation, glMatrix.toRadian(1))
+            quat.rotateX(newRotation, newRotation, glMatrix.toRadian(1))
             cubeObject3D.setRotation(newRotation)
 
             // clear the canvas and draw
