@@ -64,6 +64,12 @@ export class Object3D {
         this.scale = sca
     }
 
+    public getModelMatrix(): mat4 {
+        const mMat = mat4.create()
+        mat4.fromRotationTranslationScale(mMat, this.rotation, this.position, this.scale)
+        return mMat
+    }
+
     public render(viewMatrix: mat4, projectionMatrix: mat4) {
         const gl = this.gl
 
@@ -71,9 +77,8 @@ export class Object3D {
         gl.useProgram(this.shaderProgram)
 
         // set up object transformations
-        const modelMatrix = mat4.create()
-        mat4.fromRotationTranslationScale(modelMatrix, this.rotation, this.position, this.scale)
-
+        const modelMatrix = this.getModelMatrix()
+        
         // Get uniform locations
         const modelMatrixUniformLocation = gl.getUniformLocation(this.shaderProgram, 'uModelMatrix')
         const viewMatrixLocation = gl.getUniformLocation(this.shaderProgram, 'uViewMatrix')
