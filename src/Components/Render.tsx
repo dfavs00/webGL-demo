@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { CubeModel } from './Cube'
-import { mat4, vec3 } from 'gl-matrix'
+import { quat, mat4, vec3, glMatrix } from 'gl-matrix'
 import { basicVertexShader } from './VertexShaders'
 import { basicFragmentShader } from './FragmentShaders'
 import { Object3D } from './Object3D'
@@ -71,12 +71,14 @@ const Render: React.FC<RenderProps> = ({loading}: RenderProps) => {
         const cubeObject3D = new Object3D(gl, CubeModel, vertexShader, fragmentShader, lightBrown)
         cubeObject3D.setPosition(vec3.fromValues(0.0, 0.0, -3.0))
 
-        console.log(cubeObject3D)
-
         const render = (timestamp: number) => {
-      
+
+            const newRotation = cubeObject3D.getRotation()
+            quat.rotateY(newRotation, newRotation, glMatrix.toRadian(1))
+            cubeObject3D.setRotation(newRotation)
+
             // clear the canvas and draw
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
             cubeObject3D.render(viewMatrix, projectionMatrix)
       
             // Call render again on the next frame
