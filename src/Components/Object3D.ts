@@ -13,6 +13,13 @@ import { Model } from "./Cube"
         - every object has a parent Object3D and a list of children
         - parent Object3D can be null
         - a parent will call render for all of its children, propagating its model matrix down
+
+    - Add input from the browser to be able to control things on the screen
+        - Possibly may need to send out a raycast or something to detect what was clicked on
+        - project the position on the canvas and draw a straight line back or something
+        - Ability to move around or manually rotate, dragging is ideal because this will want to be on mobile
+
+        - When a box is clicked on a shader value can be updated. Possibly just the color value, or maybe something with light
 */
 
 export class Object3D {
