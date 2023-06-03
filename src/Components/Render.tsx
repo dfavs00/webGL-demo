@@ -1,8 +1,9 @@
 import React, { useRef, useEffect } from 'react'
 import { CubeModel } from './Cube'
-import { glMatrix, mat4, vec3 } from 'gl-matrix'
+import { quat, mat4, vec3, glMatrix } from 'gl-matrix'
 import { basicVertexShader } from './VertexShaders'
 import { basicFragmentShader } from './FragmentShaders'
+import { Object3D } from './Object3D'
 
 interface RenderProps {
     loading: boolean
@@ -59,77 +60,32 @@ const Render: React.FC<RenderProps> = ({loading}: RenderProps) => {
             console.error('Fragment shader compilation failed:', gl.getShaderInfoLog(fragmentShader));
             return;
         }
-        
-
-        // Link shaders to a webgl program
-        const program = gl.createProgram()
-        if (!program) {
-            console.error('failed to create shader program')
-            return 
-        }
-        gl.attachShader(program, vertexShader)
-        gl.attachShader(program, fragmentShader)
-        gl.linkProgram(program)
-        // Verify shader program linking
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            console.error('Shader program linking failed:', gl.getProgramInfoLog(program));
-            return;
-        }
-        gl.useProgram(program)
-
-        // Create a buffer for model vertex data
-        const vertexBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(CubeModel.vertices), gl.STATIC_DRAW)
-        
-        // Create a buffer for model index data
-        const indexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(CubeModel.indices), gl.STATIC_DRAW);
-
-        // set position attribute pointer so webgl knows where to put attributes
-        //  this tells webgl how to process the vertex buffer
-        const positionAttributeLocation = gl.getAttribLocation(program, 'aPosition')
-        gl.enableVertexAttribArray(positionAttributeLocation)
-        gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0)
-
-        // Set uniform values for the shader
-        const modelMatrixLocation = gl.getUniformLocation(program, 'uModelMatrix')
-        const viewMatrixLocation = gl.getUniformLocation(program, 'uViewMatrix')
-        const projectionMatrixLocation = gl.getUniformLocation(program, 'uProjectionMatrix')
-        const colorUniformLocation = gl.getUniformLocation(program, 'uColor')
             
         // Create and set uniforms for the model view and projection matricies
-        const modelPosition = vec3.fromValues(0.0, 0.0, -3.0)
-        const modelMatrix = mat4.create()
-        mat4.translate(modelMatrix, modelMatrix, modelPosition)
-        mat4.rotateY(modelMatrix, modelMatrix, glMatrix.toRadian(45))
-        gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix)
-
+        
         const viewMatrix = mat4.create()
-        gl.uniformMatrix4fv(viewMatrixLocation, false, viewMatrix)
-
         const projectionMatrix = mat4.create();
         mat4.perspective(projectionMatrix, 1.0472, aspectRatio, 0.1, 1000)
-        gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix)
 
-        // set the color uniform
-        gl.uniform4fv(colorUniformLocation, [1.0, 0.0, 0.0, 1.0])
+        const lightBrown = [0.480, 0.368, 0.264, 1.0]
+        const cubeObject3D = new Object3D(gl, CubeModel, vertexShader, fragmentShader, lightBrown)
+        cubeObject3D.setPosition(vec3.fromValues(0.0, 0.0, -3.0))
 
         const render = (timestamp: number) => {
-            // Update animation or other logic here
-            mat4.rotateY(modelMatrix, modelMatrix, glMatrix.toRadian(1));
-            gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix);
-      
+
+            const newRotation = cubeObject3D.getRotation()
+            quat.rotateY(newRotation, newRotation, glMatrix.toRadian(1))
+            cubeObject3D.setRotation(newRotation)
+
             // clear the canvas and draw
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            gl.drawElements(gl.TRIANGLES, CubeModel.indices.length, gl.UNSIGNED_SHORT, 0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+            cubeObject3D.render(viewMatrix, projectionMatrix)
       
             // Call render again on the next frame
             requestAnimationFrame(render);
           }
       
-          // Start the rendering loop
+          // Start the rendering loop - recommended way to render a webgl scene
           requestAnimationFrame(render);
 
         return () => {
