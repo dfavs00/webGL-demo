@@ -4,12 +4,14 @@ import { quat, mat4, vec3, glMatrix } from 'gl-matrix'
 import { basicVertexShader } from './VertexShaders'
 import { basicFragmentShader } from './FragmentShaders'
 import { Object3D } from './Object3D'
+import { BasicMaterial } from './Materials/BasicMaterial'
+import { Renderer } from './Renderers/Renderer'
 
-interface RenderProps {
+interface RenderComponentProps {
     loading: boolean
 }
 
-const Render: React.FC<RenderProps> = ({loading}: RenderProps) => {
+const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     
     useEffect(() => {
@@ -68,19 +70,22 @@ const Render: React.FC<RenderProps> = ({loading}: RenderProps) => {
         mat4.perspective(projectionMatrix, 1.0472, aspectRatio, 0.1, 1000)
 
         const lightBrown = [0.480, 0.368, 0.264, 1.0]
-        const cubeObject3D = new Object3D(gl, CubeModel, vertexShader, fragmentShader, lightBrown)
-        cubeObject3D.setPosition(vec3.fromValues(0.0, 0.0, -3.0))
+        const basicMat = new BasicMaterial(gl, lightBrown)
+        const renderer = new Renderer(gl, CubeModel, basicMat)
+        
+        const cubeObject3D = new Object3D(gl, renderer)
+        cubeObject3D.position = vec3.fromValues(0.0, 0.0, -3.0)
 
         const render = (timestamp: number) => {
 
-            const newRotation = cubeObject3D.getRotation()
+            const newRotation = cubeObject3D.rotation
             quat.rotateY(newRotation, newRotation, glMatrix.toRadian(1))
             quat.rotateX(newRotation, newRotation, glMatrix.toRadian(1))
-            cubeObject3D.setRotation(newRotation)
+            cubeObject3D.rotation = newRotation
 
             // clear the canvas and draw
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-            cubeObject3D.render(viewMatrix, projectionMatrix)
+            cubeObject3D.render({viewMatrix, projectionMatrix})
       
             // Call render again on the next frame
             requestAnimationFrame(render);
