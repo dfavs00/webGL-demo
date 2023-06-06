@@ -7,10 +7,6 @@ export enum UniformType {
     MAT4,
 }
 
-export enum AttributeType {
-    VERTEX,
-}
-
 export abstract class Material {
     protected _gl: WebGL2RenderingContext
     protected _shaderProgram: WebGLProgram
@@ -49,15 +45,10 @@ export abstract class Material {
         }
     }
 
-    public setAttribute(name: string, type: AttributeType) {
+    public setVertexAttribute(name: string, size: number, type: number, normalize: boolean, stride: number, offset: number) {
         const location = this._gl.getAttribLocation(this._shaderProgram, name)
-
-        switch(type) {
-            case AttributeType.VERTEX:
-                this._gl.enableVertexAttribArray(location)
-                this._gl.vertexAttribPointer(location, 3, this._gl.FLOAT, false, 0, 0)
-                break
-        }
+        this._gl.enableVertexAttribArray(location)
+        this._gl.vertexAttribPointer(location, size, type, normalize, stride, offset)
     }
 
     public use() {

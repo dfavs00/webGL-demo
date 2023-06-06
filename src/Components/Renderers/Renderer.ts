@@ -1,11 +1,36 @@
 import { mat4 } from "gl-matrix";
-import { AttributeType, Material } from "../Materials/Material";
+import { Material } from "../Materials/Material";
 import { ObjectRenderProps } from "../Object3D";
-import { Model } from "../Cube";
+import { Model } from "../Model";
+
+/*
+ * Vertex Buffer Constants:
+ * the array below is made up of model data like vertices, normals, and texture coords, 
+ * it gets placed in a vertex buffer object and we can specify to webGL how it should
+ * read the information from this array for each vertex, and bind it to an attribute 
+ * in the vertex shader
+ * 
+ * [posX, posY, posZ, normX, normY, normX] 
+ */
+
+// Positions
+const PositionBufferDataSize = 3
+const PositionBufferDataOffset = 0
+
+// Normals
+const NormalBufferDataSize = 3
+const NormalBufferDataOffset = 3 * Float32Array.BYTES_PER_ELEMENT
+
+// The total size of one buffer "unit" (array seen above)
+// The 6 will change as more data gets packed into the buffer
+const BufferDataStride = 6 * Float32Array.BYTES_PER_ELEMENT
+
 
 export interface RenderProperties extends ObjectRenderProps {
     modelMatrix: mat4
 }
+
+
 
 export class Renderer {
     private _gl: WebGL2RenderingContext
@@ -19,9 +44,7 @@ export class Renderer {
     }
 
     /**
-     * This function will be different for every MeshRenderer
-     *  it will get called on every single re-render of the object a Renderer is 
-     *   attached to
+     * This function will be called on every render frame
      */
     public render(props: RenderProperties): void {
         this._material.use()
@@ -30,10 +53,12 @@ export class Renderer {
         // bind model vertices
         const vertexBuffer = this._gl.createBuffer()
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, vertexBuffer)
-        this._gl.bufferData(this._gl.ARRAY_BUFFER, new Float32Array(this._model.vertices), this._gl.STATIC_DRAW)
+        this._gl.bufferData(this._gl.ARRAY_BUFFER, new Float32Array(this._model.vertexBufferData), this._gl.STATIC_DRAW)
 
         // set position attribute location
-        this._material.setAttribute('aPosition', AttributeType.VERTEX)
+        this._material.setVertexAttribute('aPosition', PositionBufferDataSize, this._gl.FLOAT, false, BufferDataStride, PositionBufferDataOffset)
+        this._material.setVertexAttribute('aNormal', NormalBufferDataSize, this._gl.FLOAT, false, BufferDataStride, NormalBufferDataOffset)
+
 
         // TODO -- could also set up the other attribute locations here too like normals texture etc -- 
 

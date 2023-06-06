@@ -16,7 +16,7 @@ export const lightVertexShader: string =
 `#version 300 es
 
 in vec3 aPosition;
-in vec3 aNormal
+in vec3 aNormal;
 
 uniform mat4 uModelMatrix;
 uniform mat4 uViewMatrix;

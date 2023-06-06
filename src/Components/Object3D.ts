@@ -26,11 +26,16 @@ import { Renderer } from "./Renderers/Renderer"
         - When a box is clicked on a shader value can be updated. Possibly just the color value, or maybe something with light
 */
 
+export interface LightProps {
+    lightDirection: vec3
+    lightColor: vec3
+    lightAmbientColor: vec3
+}
+
 export interface ObjectRenderProps {
     viewMatrix: mat4
     projectionMatrix: mat4
-
-    // Add lighting properties eventually
+    lightProps: LightProps
 }
 
 export class Object3D {

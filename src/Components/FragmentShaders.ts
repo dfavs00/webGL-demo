@@ -14,6 +14,7 @@ void main() {
 `
 
 // Uses normals and light to darken colors on the cube where light is less direct
+// Ambient light in a given direction
 export const lightFragmentShader: string = 
 `#version 300 es
 
