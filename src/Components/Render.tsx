@@ -1,15 +1,16 @@
 import React, { useRef, useEffect } from 'react'
-import { CubeModel } from './Cube'
+import { CubeModelData } from './Cube'
 import { quat, mat4, vec3, glMatrix } from 'gl-matrix'
-import { basicVertexShader } from './VertexShaders'
-import { basicFragmentShader } from './FragmentShaders'
 import { Object3D } from './Object3D'
+import { Renderer } from './Renderers/Renderer'
+import { Model } from './Model'
+import { LightMaterial } from './Materials/LightMaterial'
 
-interface RenderProps {
+interface RenderComponentProps {
     loading: boolean
 }
 
-const Render: React.FC<RenderProps> = ({loading}: RenderProps) => {
+const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     
     useEffect(() => {
@@ -30,56 +31,43 @@ const Render: React.FC<RenderProps> = ({loading}: RenderProps) => {
 
         // enable depth testing
         gl.enable(gl.DEPTH_TEST)
-
-        // compile vertex shader
-        //const vertexShaderCode = getGLSLFromPath(vertexShaderSource)
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER)
-        if (!vertexShader) {
-            console.error('failed to create vertex shader')
-            return 
-        }
-        gl.shaderSource(vertexShader, basicVertexShader)
-        gl.compileShader(vertexShader)
-        // Verify vertex shader compilation
-        if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-            console.error('Vertex shader compilation failed:', gl.getShaderInfoLog(vertexShader));
-            return;
-        }
-
-        // compile fragment shader
-        //const fragmentShaderCode = getGLSLFromPath(fragmentShaderSource)
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
-        if (!fragmentShader) {
-            console.error('failed to create fragment shader')
-            return 
-        }
-        gl.shaderSource(fragmentShader, basicFragmentShader)
-        gl.compileShader(fragmentShader)
-        // Verify fragment shader compilation
-        if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-            console.error('Fragment shader compilation failed:', gl.getShaderInfoLog(fragmentShader));
-            return;
-        }
             
-        // Create and set uniforms for the model view and projection matricies
-        
+        // Create view and projection matricies
         const viewMatrix = mat4.create()
         const projectionMatrix = mat4.create();
         mat4.perspective(projectionMatrix, 1.0472, aspectRatio, 0.1, 1000)
 
+        const cubeModel = new Model(CubeModelData)
+
         const lightBrown = [0.480, 0.368, 0.264, 1.0]
-        const cubeObject3D = new Object3D(gl, CubeModel, vertexShader, fragmentShader, lightBrown)
-        cubeObject3D.setPosition(vec3.fromValues(0.0, 0.0, -3.0))
+        const basicMat = new LightMaterial(gl, lightBrown)
+        const renderer = new Renderer(gl, cubeModel, basicMat)
+        
+        const cubeObject3D = new Object3D(gl, renderer)
+        cubeObject3D.position = vec3.fromValues(0.0, 0.0, -3.0)
+
+
+        // setup lighting properties
+        const lightDirection = vec3.fromValues(0.0, 1.0, 1.0)
 
         const render = (timestamp: number) => {
 
-            const newRotation = cubeObject3D.getRotation()
+            const newRotation = cubeObject3D.rotation
             quat.rotateY(newRotation, newRotation, glMatrix.toRadian(1))
-            cubeObject3D.setRotation(newRotation)
+            quat.rotateX(newRotation, newRotation, glMatrix.toRadian(1))
+            cubeObject3D.rotation = newRotation
 
             // clear the canvas and draw
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-            cubeObject3D.render(viewMatrix, projectionMatrix)
+            cubeObject3D.render({
+                viewMatrix, 
+                projectionMatrix,
+                lightProps: {
+                    lightAmbientColor: vec3.fromValues(0.5, 0.5, 0.5),
+                    lightColor: vec3.fromValues(1.0, 1.0, 1.0),
+                    lightDirection
+                }
+            })
       
             // Call render again on the next frame
             requestAnimationFrame(render);
