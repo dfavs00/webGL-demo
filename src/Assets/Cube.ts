@@ -1,4 +1,4 @@
-import { ModelData } from "./Model";
+import { ModelData } from "../GraphicsEngine/Model";
 
 /*
  * A model representing a simple cube 

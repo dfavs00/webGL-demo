@@ -1,7 +1,10 @@
 import { quat, vec3, mat4 } from "gl-matrix"
-import { Renderer } from "./Renderers/Renderer"
+import { Renderer } from "./Renderer"
+import { Light } from "./Light/Light"
 
 /* Next Steps:
+
+    - 
 
     - Make a "Scene" that you can add objects to in a map (no duplicates) and it renders each base object
 
@@ -16,16 +19,10 @@ import { Renderer } from "./Renderers/Renderer"
         - When a box is clicked on a shader value can be updated. Possibly just the color value, or maybe something with light
 */
 
-export interface LightProps {
-    lightDirection: vec3
-    lightColor: vec3
-    lightAmbientColor: vec3
-}
-
 export interface ObjectRenderProps {
     viewMatrix: mat4
     projectionMatrix: mat4
-    lightProps: LightProps
+    light: Light
 }
 
 export class Object3D {

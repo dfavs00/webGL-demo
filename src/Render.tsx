@@ -1,12 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { CubeModelData } from './Cube'
+import { CubeModelData } from './Assets/Cube'
 import { mat4, vec3, quat, glMatrix } from 'gl-matrix'
-import { Object3D } from './Object3D'
-import { Renderer } from './Renderers/Renderer'
-import { Model, parseOBJ } from './Model'
-import { LightMaterial } from './Materials/LightMaterial'
-import { Transform, base, boxes4x2 } from '../BoxConfig'
-import { shuttleOBJData } from './shuttle'
+import { Object3D } from './GraphicsEngine/Object3D'
+import { Renderer } from './GraphicsEngine/Renderer'
+import { Model, parseOBJ } from './GraphicsEngine/Model'
+import { LightMaterial } from './GraphicsEngine/Materials/LightMaterial'
+import { Transform, base, boxes4x2 } from './BoxConfig'
+import { shuttleOBJData } from './Assets/shuttle'
 
 interface RenderComponentProps {
     loading: boolean
@@ -150,16 +150,16 @@ const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps)
             baseObject.rotation = mainRotation
 
             // clear the canvas and draw
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-            baseObject.render({
-                viewMatrix, 
-                projectionMatrix,
-                lightProps: {
-                    lightAmbientColor: vec3.fromValues(0.5, 0.5, 0.5),
-                    lightColor: vec3.fromValues(1.0, 1.0, 1.0),
-                    lightDirection
-                }
-            })
+            // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+            // baseObject.render({
+            //     viewMatrix, 
+            //     projectionMatrix,
+            //     lightProps: {
+            //         lightAmbientColor: vec3.fromValues(0.5, 0.5, 0.5),
+            //         lightColor: vec3.fromValues(1.0, 1.0, 1.0),
+            //         lightDirection
+            //     }
+            // })
       
             // Call render again on the next frame
             requestAnimationFrame(render)

@@ -1,5 +1,5 @@
 import React from 'react';
-import Render from './Components/Render';
+import Render from './Render';
 
 function App() {
   return (
