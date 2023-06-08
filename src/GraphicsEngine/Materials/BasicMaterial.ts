@@ -1,5 +1,5 @@
 import { compileShader, createShaderProgram } from "../ShaderUtils"
-import { basicVertexShader } from "../VertexShaders"
+import { basicVertexShader } from "../../Assets/VertexShaders"
 import { basicFragmentShader } from "../../Assets/FragmentShaders"
 import { Material, UniformType } from "./Material"
 import { RenderProperties } from "../Renderer"

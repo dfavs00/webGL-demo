@@ -2,7 +2,7 @@
  * 
  * @param gl the current WebGL2RenderingContext
  * @param vShader a compiled vertex shader
- * @param fShader a comiled fragment shader
+ * @param fShader a compiled fragment shader
  * @returns a successfully linked shader program
  */
 export const createShaderProgram = (gl: WebGL2RenderingContext, vShader: WebGLShader, fShader: WebGLShader): WebGLProgram => {
