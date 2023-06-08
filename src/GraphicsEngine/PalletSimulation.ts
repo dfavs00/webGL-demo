@@ -14,13 +14,21 @@ import { Transform } from "./Transform"
  * @summary class to run a pallet simulation and directly be called by the frontend framework
  */
 export class PalletSimulation {
+    static readonly rotationSpeed: number = 2.0 // degrees
+    static readonly rotationSensitivity: number = 0.1
+
+
     private _gl: WebGL2RenderingContext
     private _scene: Scene
 
     private _baseObjectRotation: quat
     private _baseObject: Object3D | null
 
-    static readonly rotationSpeed: number = 2.0 // degrees
+    // screen dragging variablees
+    private _isDragging: boolean = false
+    private _lastMouseX: number = 0
+    private _lastMouseY: number = 0
+
 
     constructor(gl: WebGL2RenderingContext) {
         this._gl = gl
@@ -69,10 +77,21 @@ export class PalletSimulation {
         // add event listeners
         this.handleKeyDown = this.handleKeyDown.bind(this)
         window.addEventListener('keydown', this.handleKeyDown)
+
         this.handleResize = this.handleResize.bind(this)
         window.addEventListener('resize', this.handleResize)
 
+        this.handleMouseDown = this.handleMouseDown.bind(this)
+        window.addEventListener('mousedown', this.handleMouseDown)
+
+        this.handleMouseMove = this.handleMouseMove.bind(this)
+        window.addEventListener('mousemove', this.handleMouseMove)
+
+        this.handleMouseUp = this.handleMouseUp.bind(this)
+        window.addEventListener('mouseup', this.handleMouseUp)
+
         this.handleResize()
+
         requestAnimationFrame(this.render)
     }
 
@@ -82,6 +101,15 @@ export class PalletSimulation {
 
         this.handleResize = this.handleResize.bind(this)
         window.removeEventListener('resize', this.handleResize)
+
+        this.handleMouseDown = this.handleMouseDown.bind(this)
+        window.removeEventListener('mousedown', this.handleMouseDown)
+
+        this.handleMouseMove = this.handleMouseMove.bind(this)
+        window.removeEventListener('mousemove', this.handleMouseMove)
+
+        this.handleMouseUp = this.handleMouseUp.bind(this)
+        window.removeEventListener('mouseup', this.handleMouseUp)
     }
 
     private render(timestamp: number) {
@@ -167,5 +195,33 @@ export class PalletSimulation {
         this._scene.camera.projection = cameraProjection
 
         this._gl.viewport(0, 0, width, height)
+    }
+
+    private handleMouseDown = (event: MouseEvent) => {
+        this._isDragging = true
+        this._lastMouseX = event.clientX
+        this._lastMouseY = event.clientY
+    }
+
+    private handleMouseMove = (event: MouseEvent) => {
+        if (!this._isDragging) {
+            return
+        }
+
+        const deltaX = event.clientX - this._lastMouseX
+        // const deltaY = event.clientY - this._lastMouseY
+
+        if (this._baseObject) {
+            this._baseObject.transform.rotation = quat.rotateY(quat.create(), this._baseObject.transform.rotation, glMatrix.toRadian(deltaX * PalletSimulation.rotationSensitivity))
+        }
+
+        // maybe move the camera up and down a little based on the delta-y but clamp between 2 values
+        
+        this._lastMouseX = event.clientX
+        this._lastMouseY = event.clientY
+    }
+
+    private handleMouseUp = (event: MouseEvent) => {
+        this._isDragging = false
     }
 }
