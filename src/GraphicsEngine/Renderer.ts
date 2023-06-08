@@ -1,7 +1,7 @@
 import { mat4 } from "gl-matrix";
-import { Material } from "../Materials/Material";
-import { ObjectRenderProps } from "../Object3D";
-import { Model } from "../Model";
+import { Material } from "./Materials/Material";
+import { ObjectRenderProps } from "./Object3D";
+import { Model } from "./Model";
 
 /*
  * Vertex Buffer Constants:

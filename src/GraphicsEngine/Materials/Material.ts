@@ -1,4 +1,4 @@
-import { RenderProperties } from "../Renderers/Renderer"
+import { RenderProperties } from "../Renderer"
 
 export enum UniformType {
     FLOAT,

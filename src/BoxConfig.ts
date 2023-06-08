@@ -1,4 +1,5 @@
 import { quat, vec3 } from "gl-matrix";
+import { Transform } from "./GraphicsEngine/Transform";
 
 /* 1[unit] = 1[in]
  * The Cube model is 1x1x1[unit] by default which we will say is equivalent to 1x1x1[in]
@@ -16,17 +17,11 @@ import { quat, vec3 } from "gl-matrix";
 
 const baseHeight = 8;
 
-export interface Transform {
-    position: vec3 // x, y, z
-    rotation: quat
-    scale: vec3    // length, height, width (x, y, z)
-}
-
-export const base: Transform = {
-    position: vec3.fromValues(0, 0, 0),
-    rotation: quat.create(),
-    scale: vec3.fromValues(48, baseHeight, 48)
-}
+export const base: Transform = new Transform(
+    vec3.fromValues(0, 0, 0),
+    quat.create(),
+    vec3.fromValues(48, baseHeight, 48)
+)
 
 // stack of 16x16x16 boxes arranged 2 stacks of 4 boxes evenly with corners pinned to center
 // vec3.fromValues(-boxUnit / 2, boxUnit / 2 + baseHeight, boxUnit / 2),
@@ -36,45 +31,45 @@ const halfBoxUnit = boxUnit / 2
 const artificialGap = 0.25
 export const boxes4x2: Transform[] = [
     // First Tier
-    {
-        position: vec3.fromValues(-halfBoxUnit - artificialGap, 0, halfBoxUnit + artificialGap),
-        rotation: quat.create(),
-        scale: vec3.fromValues(boxUnit, boxUnit, boxUnit),
-    },
-    {
-        position: vec3.fromValues(-halfBoxUnit - artificialGap, 0, -halfBoxUnit - artificialGap),
-        rotation: quat.create(),
-        scale: vec3.fromValues(boxUnit, boxUnit, boxUnit),
-    },
-    {
-        position: vec3.fromValues(halfBoxUnit + artificialGap, 0, -halfBoxUnit - artificialGap),
-        rotation: quat.create(),
-        scale: vec3.fromValues(boxUnit, boxUnit, boxUnit),
-    },
-    {
-        position: vec3.fromValues(halfBoxUnit + artificialGap, 0, halfBoxUnit + artificialGap),
-        rotation: quat.create(),
-        scale: vec3.fromValues(boxUnit, boxUnit, boxUnit),
-    },
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, 0, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, 0, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, 0, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, 0, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
     // Second Tier
-    {
-        position: vec3.fromValues(-halfBoxUnit - artificialGap, boxUnit + artificialGap, halfBoxUnit + artificialGap),
-        rotation: quat.create(),
-        scale: vec3.fromValues(boxUnit, boxUnit, boxUnit),
-    },
-    {
-        position: vec3.fromValues(-halfBoxUnit - artificialGap, boxUnit + artificialGap, -halfBoxUnit - artificialGap),
-        rotation: quat.create(),
-        scale: vec3.fromValues(boxUnit, boxUnit, boxUnit),
-    },
-    {
-        position: vec3.fromValues(halfBoxUnit + artificialGap, boxUnit + artificialGap, -halfBoxUnit - artificialGap),
-        rotation: quat.create(),
-        scale: vec3.fromValues(boxUnit, boxUnit, boxUnit),
-    },
-    {
-        position: vec3.fromValues(halfBoxUnit + artificialGap, boxUnit + artificialGap, halfBoxUnit + artificialGap),
-        rotation: quat.create(),
-        scale: vec3.fromValues(boxUnit, boxUnit, boxUnit),
-    },
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, boxUnit + artificialGap, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, boxUnit + artificialGap, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, boxUnit + artificialGap, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, boxUnit + artificialGap, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
 ]

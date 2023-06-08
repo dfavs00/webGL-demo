@@ -1,7 +1,11 @@
-import { quat, vec3, mat4 } from "gl-matrix"
-import { Renderer } from "./Renderers/Renderer"
+import { mat4 } from "gl-matrix"
+import { Renderer } from "./Renderer"
+import { Light } from "./Light/Light"
+import { Transform } from "./Transform"
 
 /* Next Steps:
+
+    - 
 
     - Make a "Scene" that you can add objects to in a map (no duplicates) and it renders each base object
 
@@ -16,82 +20,47 @@ import { Renderer } from "./Renderers/Renderer"
         - When a box is clicked on a shader value can be updated. Possibly just the color value, or maybe something with light
 */
 
-export interface LightProps {
-    lightDirection: vec3
-    lightColor: vec3
-    lightAmbientColor: vec3
-}
-
 export interface ObjectRenderProps {
     viewMatrix: mat4
     projectionMatrix: mat4
-    lightProps: LightProps
+    light: Light
 }
 
 export class Object3D {
     private _gl: WebGL2RenderingContext
     private _parent: Object3D | null
-    private _children: Object3D[]
     private _renderer: Renderer
-    private _position: vec3
-    private _rotation: quat
-    private _scale: vec3
+    private _transform: Transform
+    private _children: Object3D[]
 
-    constructor(gl: WebGL2RenderingContext, renderer: Renderer, children: Object3D[]) {
+    constructor(gl: WebGL2RenderingContext, renderer: Renderer, children?: Object3D[], transform?: Transform) {
         this._gl = gl
         this._renderer = renderer
-        this._position = vec3.create()
-        this._rotation = quat.create()
-        this._scale = vec3.fromValues(1, 1, 1)
+        this._transform = transform ?? new Transform()
         this._parent = null
-        children.forEach((child: Object3D) => {
+
+        children?.forEach((child: Object3D) => {
             child.setParent(this)
         })
-        this._children = children
+        this._children = children ?? []
         
+    }
+
+    public get transform(): Transform {
+        return this._transform
     }
 
     private setParent(parent: Object3D): void {
         this._parent = parent
     }
 
-    public get position(): vec3 {
-        return vec3.clone(this._position)
-    }
-
-    public get rotation(): quat {
-        return quat.clone(this._rotation)
-    }
-
-    public get scale(): vec3 {
-        return vec3.clone(this._scale)
-    }
-
-    public set position(pos: vec3){
-        this._position = pos
-    }
-
-    public set rotation(rot: quat){
-        this._rotation = rot
-    }
-
-    public set scale(sca: vec3) {
-        this._scale = sca
-    }
-
-    public getModelMatrix(): mat4 {
-        const mMat = mat4.create()
-        mat4.fromRotationTranslationScale(mMat, this._rotation, this._position, this._scale)
-        return mMat
-    }
-
     public render(props: ObjectRenderProps) {
 
         var modelMatrix: mat4 = mat4.create()
         if (this._parent) {
-            mat4.multiply(modelMatrix, this._parent.getModelMatrix(), this.getModelMatrix())
+            mat4.multiply(modelMatrix, this._parent.transform.matrix, this.transform.matrix)
         } else {
-            modelMatrix = this.getModelMatrix()
+            modelMatrix = this.transform.matrix
         }
 
         // Render the object

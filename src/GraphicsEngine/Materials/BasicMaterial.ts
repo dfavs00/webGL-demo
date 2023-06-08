@@ -1,8 +1,8 @@
 import { compileShader, createShaderProgram } from "../ShaderUtils"
-import { basicVertexShader } from "../VertexShaders"
-import { basicFragmentShader } from "../FragmentShaders"
+import { basicVertexShader } from "../../Assets/VertexShaders"
+import { basicFragmentShader } from "../../Assets/FragmentShaders"
 import { Material, UniformType } from "./Material"
-import { RenderProperties } from "../Renderers/Renderer"
+import { RenderProperties } from "../Renderer"
 
 export class BasicMaterial extends Material {
     private _color: number[]

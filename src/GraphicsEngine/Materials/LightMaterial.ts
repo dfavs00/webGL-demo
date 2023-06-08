@@ -1,8 +1,8 @@
 import { compileShader, createShaderProgram } from "../ShaderUtils"
-import { lightVertexShader } from "../VertexShaders"
-import { lightFragmentShader } from "../FragmentShaders"
+import { lightVertexShader } from "../../Assets/VertexShaders"
+import { lightFragmentShader } from "../../Assets/FragmentShaders"
 import { Material, UniformType } from "./Material"
-import { RenderProperties } from "../Renderers/Renderer"
+import { RenderProperties } from "../Renderer"
 
 export class LightMaterial extends Material {
     private _color: number[]
@@ -24,9 +24,9 @@ export class LightMaterial extends Material {
         this.setUniform('uModelMatrix', UniformType.MAT4, props.modelMatrix)
         this.setUniform('uViewMatrix', UniformType.MAT4, props.viewMatrix)
         this.setUniform('uProjectionMatrix', UniformType.MAT4, props.projectionMatrix)
-        this.setUniform('uLightDirection', UniformType.VEC3, props.lightProps.lightDirection)
-        this.setUniform('uLightColor', UniformType.VEC3, props.lightProps.lightColor)
-        this.setUniform('uAmbientColor', UniformType.VEC3, props.lightProps.lightAmbientColor)
+        this.setUniform('uLightDirection', UniformType.VEC3, props.light.direction)
+        this.setUniform('uLightColor', UniformType.VEC3, props.light.color)
+        this.setUniform('uAmbientColor', UniformType.VEC3, props.light.ambientColor)
         this.setUniform('uColor', UniformType.VEC4, this._color)
     }
 }
