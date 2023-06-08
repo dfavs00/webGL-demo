@@ -58,9 +58,7 @@ export class Renderer {
         // set position attribute location
         this._material.setVertexAttribute('aPosition', PositionBufferDataSize, this._gl.FLOAT, false, BufferDataStride, PositionBufferDataOffset)
         this._material.setVertexAttribute('aNormal', NormalBufferDataSize, this._gl.FLOAT, false, BufferDataStride, NormalBufferDataOffset)
-
-
-        // TODO -- could also set up the other attribute locations here too like normals texture etc -- 
+        // TODO -- could also set up the other attribute locations here too like texture etc -- 
 
         // bind model indices
         const indexBuffer = this._gl.createBuffer()
