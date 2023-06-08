@@ -2,21 +2,11 @@ import { quat, vec3, mat4 } from "gl-matrix"
 import { Renderer } from "./Renderers/Renderer"
 
 /* Next Steps:
-    - Abstract the shaders into a shader program, that contains a webGLShaderProgram inside it, but all we care about is using it 
-       and setting the uniforms properly, it can extend a normal shader, take a vertex and frag shader, but the uniforms can be passed in either through
-         some interface or a constructor... Think about it more...
 
-    - Add lighting to the shader (will need cube normals)
-        - class changes, new uniforms for light
-        - possibly abstract shader program
+    - Make a "Scene" that you can add objects to in a map (no duplicates) and it renders each base object
 
     - Add texture to the shader (will need texCoords and cube normals)
         - same as above, figure out texture stuff again
-
-    - Add an object hierarchy
-        - every object has a parent Object3D and a list of children
-        - parent Object3D can be null
-        - a parent will call render for all of its children, propagating its model matrix down (child can just access the parent object)
 
     - Add input from the browser to be able to control things on the screen
         - Possibly may need to send out a raycast or something to detect what was clicked on
@@ -40,17 +30,29 @@ export interface ObjectRenderProps {
 
 export class Object3D {
     private _gl: WebGL2RenderingContext
+    private _parent: Object3D | null
+    private _children: Object3D[]
     private _renderer: Renderer
     private _position: vec3
     private _rotation: quat
     private _scale: vec3
 
-    constructor(gl: WebGL2RenderingContext, renderer: Renderer) {
+    constructor(gl: WebGL2RenderingContext, renderer: Renderer, children: Object3D[]) {
         this._gl = gl
         this._renderer = renderer
         this._position = vec3.create()
         this._rotation = quat.create()
         this._scale = vec3.fromValues(1, 1, 1)
+        this._parent = null
+        children.forEach((child: Object3D) => {
+            child.setParent(this)
+        })
+        this._children = children
+        
+    }
+
+    private setParent(parent: Object3D): void {
+        this._parent = parent
     }
 
     public get position(): vec3 {
@@ -85,8 +87,12 @@ export class Object3D {
 
     public render(props: ObjectRenderProps) {
 
-        // set up object transformations
-        const modelMatrix = this.getModelMatrix()
+        var modelMatrix: mat4 = mat4.create()
+        if (this._parent) {
+            mat4.multiply(modelMatrix, this._parent.getModelMatrix(), this.getModelMatrix())
+        } else {
+            modelMatrix = this.getModelMatrix()
+        }
 
         // Render the object
         this._renderer.render({
@@ -95,5 +101,8 @@ export class Object3D {
         })
 
         // eventually render its children objects here
+        this._children.forEach((child: Object3D) => {
+            child.render(props)
+        })
     }
 }
