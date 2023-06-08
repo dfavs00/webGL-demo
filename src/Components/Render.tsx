@@ -81,11 +81,11 @@ const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps)
         boxes4x2.forEach((box: Transform) => {
             const boxObj = new Object3D(gl, boxRenderer, [])
 
-            // y position adjustment -> position of the center of the box + half height of base + half height of box, divide this by the scale
+            // y position adjustment -> position of the center of the box + half height of base + half height of box, divide this by the scale of the base
             boxObj.position = vec3.fromValues(
-                box.position[0]/base.scale[0], 
-                (box.scale[1] / 2 + box.position[1] + base.scale[1] / 2)/base.scale[1], 
-                box.position[2]/base.scale[2]
+                box.position[0] / base.scale[0],
+                (box.scale[1] / 2 + box.position[1] + base.scale[1] / 2) / base.scale[1],
+                box.position[2] / base.scale[2],
             )
 
             // rotation remains the same
@@ -139,7 +139,7 @@ const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps)
         mat4.translate(viewMatrix, viewMatrix, vec3.fromValues(-cameraPos[0], -cameraPos[1], -cameraPos[2]))
 
         const baseObject = createSceneObject(gl)
-        
+        // const baseObject = objFileTest(gl)
 
         baseObject.rotation = mainRotation
 
