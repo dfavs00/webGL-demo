@@ -9,6 +9,7 @@ import { Projection, Scene } from "./Scene"
 import { Light } from "./Light/Light"
 import { Camera } from "./Camera/Camera"
 import { Transform } from "./Transform"
+import { MouseEvent } from "react"
 
 /**
  * @summary class to run a pallet simulation and directly be called by the frontend framework
@@ -75,20 +76,8 @@ export class PalletSimulation {
 
     public begin(): void {
         // add event listeners
-        this.handleKeyDown = this.handleKeyDown.bind(this)
-        window.addEventListener('keydown', this.handleKeyDown)
-
         this.handleResize = this.handleResize.bind(this)
         window.addEventListener('resize', this.handleResize)
-
-        this.handleMouseDown = this.handleMouseDown.bind(this)
-        window.addEventListener('mousedown', this.handleMouseDown)
-
-        this.handleMouseMove = this.handleMouseMove.bind(this)
-        window.addEventListener('mousemove', this.handleMouseMove)
-
-        this.handleMouseUp = this.handleMouseUp.bind(this)
-        window.addEventListener('mouseup', this.handleMouseUp)
 
         this.handleResize()
 
@@ -96,20 +85,8 @@ export class PalletSimulation {
     }
 
     public stop(): void {
-        this.handleKeyDown = this.handleKeyDown.bind(this)
-        window.removeEventListener('keydown', this.handleKeyDown)
-
-        this.handleResize = this.handleResize.bind(this)
+        // clean up if necessary
         window.removeEventListener('resize', this.handleResize)
-
-        this.handleMouseDown = this.handleMouseDown.bind(this)
-        window.removeEventListener('mousedown', this.handleMouseDown)
-
-        this.handleMouseMove = this.handleMouseMove.bind(this)
-        window.removeEventListener('mousemove', this.handleMouseMove)
-
-        this.handleMouseUp = this.handleMouseUp.bind(this)
-        window.removeEventListener('mouseup', this.handleMouseUp)
     }
 
     private render(timestamp: number) {
@@ -156,28 +133,7 @@ export class PalletSimulation {
         return sceneObjects
     }
 
-    private handleKeyDown = (event: KeyboardEvent) => {
-        if (!this._baseObject) {
-            return
-        }
-
-        switch (event.key) {    
-            case 'a':
-                this._baseObject.transform.rotation = quat.rotateY(this._baseObject.transform.rotation, this._baseObject.transform.rotation, glMatrix.toRadian(PalletSimulation.rotationSpeed))
-                break
-            case 'd':
-                this._baseObject.transform.rotation = quat.rotateY(this._baseObject.transform.rotation, this._baseObject.transform.rotation, glMatrix.toRadian(-PalletSimulation.rotationSpeed))
-                break
-            case 'w':
-                this._baseObject.transform.rotation = quat.rotateX(this._baseObject.transform.rotation, this._baseObject.transform.rotation, glMatrix.toRadian(-PalletSimulation.rotationSpeed))
-                break
-            case 's':
-                this._baseObject.transform.rotation = quat.rotateX(this._baseObject.transform.rotation, this._baseObject.transform.rotation, glMatrix.toRadian(PalletSimulation.rotationSpeed))
-                break
-        }
-    }
-
-    private handleResize = () => {
+    public handleResize = () => {
         const width = window.innerWidth
         const height = window.innerHeight
         const canvas = this._gl.canvas
@@ -197,13 +153,13 @@ export class PalletSimulation {
         this._gl.viewport(0, 0, width, height)
     }
 
-    private handleMouseDown = (event: MouseEvent) => {
+    public handleMouseDown = (event: MouseEvent) => {
         this._isDragging = true
         this._lastMouseX = event.clientX
         this._lastMouseY = event.clientY
     }
 
-    private handleMouseMove = (event: MouseEvent) => {
+    public handleMouseMove = (event: MouseEvent) => {
         if (!this._isDragging) {
             return
         }
@@ -221,7 +177,7 @@ export class PalletSimulation {
         this._lastMouseY = event.clientY
     }
 
-    private handleMouseUp = (event: MouseEvent) => {
+    public handleMouseUp = (event: MouseEvent) => {
         this._isDragging = false
     }
 }
