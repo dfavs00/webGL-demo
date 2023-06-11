@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, MouseEvent } from 'react'
 import { PalletSimulation } from './GraphicsEngine/PalletSimulation'
 
 interface RenderComponentProps {
@@ -11,6 +11,24 @@ const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps)
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const palletSimulationRef = useRef<PalletSimulation | null>(null)
+
+    const onMouseDown = (event: MouseEvent): void => {
+        if (palletSimulationRef.current) {
+            palletSimulationRef.current.handleMouseDown(event)
+        }
+    }
+
+    const onMouseUp = (event: MouseEvent): void => {
+        if (palletSimulationRef.current) {
+            palletSimulationRef.current.handleMouseUp(event)
+        }
+    }
+
+    const onMouseMove = (event: MouseEvent): void => {
+        if (palletSimulationRef.current) {
+            palletSimulationRef.current.handleMouseMove(event)
+        }
+    }
 
     // handle window resize
     useEffect(() => {
@@ -46,7 +64,13 @@ const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps)
         }
     }, [])
 
-    return <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight}/>
+    return <canvas 
+            ref={canvasRef} 
+            width={canvasWidth} 
+            height={canvasHeight}
+            onMouseMove={onMouseMove}
+            onMouseDown={onMouseDown}
+            onMouseUp={onMouseUp} />
 }
 
 export default Render

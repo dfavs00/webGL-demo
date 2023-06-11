@@ -9,18 +9,27 @@ import { Projection, Scene } from "./Scene"
 import { Light } from "./Light/Light"
 import { Camera } from "./Camera/Camera"
 import { Transform } from "./Transform"
+import { MouseEvent } from "react"
 
 /**
  * @summary class to run a pallet simulation and directly be called by the frontend framework
  */
 export class PalletSimulation {
+    static readonly rotationSpeed: number = 2.0 // degrees
+    static readonly rotationSensitivity: number = 0.1
+
+
     private _gl: WebGL2RenderingContext
     private _scene: Scene
 
     private _baseObjectRotation: quat
     private _baseObject: Object3D | null
 
-    static readonly rotationSpeed: number = 2.0 // degrees
+    // screen dragging variablees
+    private _isDragging: boolean = false
+    private _lastMouseX: number = 0
+    private _lastMouseY: number = 0
+
 
     constructor(gl: WebGL2RenderingContext) {
         this._gl = gl
@@ -67,20 +76,16 @@ export class PalletSimulation {
 
     public begin(): void {
         // add event listeners
-        this.handleKeyDown = this.handleKeyDown.bind(this)
-        window.addEventListener('keydown', this.handleKeyDown)
         this.handleResize = this.handleResize.bind(this)
         window.addEventListener('resize', this.handleResize)
 
         this.handleResize()
+
         requestAnimationFrame(this.render)
     }
 
     public stop(): void {
-        this.handleKeyDown = this.handleKeyDown.bind(this)
-        window.removeEventListener('keydown', this.handleKeyDown)
-
-        this.handleResize = this.handleResize.bind(this)
+        // clean up if necessary
         window.removeEventListener('resize', this.handleResize)
     }
 
@@ -128,28 +133,7 @@ export class PalletSimulation {
         return sceneObjects
     }
 
-    private handleKeyDown = (event: KeyboardEvent) => {
-        if (!this._baseObject) {
-            return
-        }
-
-        switch (event.key) {    
-            case 'a':
-                this._baseObject.transform.rotation = quat.rotateY(this._baseObject.transform.rotation, this._baseObject.transform.rotation, glMatrix.toRadian(PalletSimulation.rotationSpeed))
-                break
-            case 'd':
-                this._baseObject.transform.rotation = quat.rotateY(this._baseObject.transform.rotation, this._baseObject.transform.rotation, glMatrix.toRadian(-PalletSimulation.rotationSpeed))
-                break
-            case 'w':
-                this._baseObject.transform.rotation = quat.rotateX(this._baseObject.transform.rotation, this._baseObject.transform.rotation, glMatrix.toRadian(-PalletSimulation.rotationSpeed))
-                break
-            case 's':
-                this._baseObject.transform.rotation = quat.rotateX(this._baseObject.transform.rotation, this._baseObject.transform.rotation, glMatrix.toRadian(PalletSimulation.rotationSpeed))
-                break
-        }
-    }
-
-    private handleResize = () => {
+    public handleResize = () => {
         const width = window.innerWidth
         const height = window.innerHeight
         const canvas = this._gl.canvas
@@ -167,5 +151,33 @@ export class PalletSimulation {
         this._scene.camera.projection = cameraProjection
 
         this._gl.viewport(0, 0, width, height)
+    }
+
+    public handleMouseDown = (event: MouseEvent) => {
+        this._isDragging = true
+        this._lastMouseX = event.clientX
+        this._lastMouseY = event.clientY
+    }
+
+    public handleMouseMove = (event: MouseEvent) => {
+        if (!this._isDragging) {
+            return
+        }
+
+        const deltaX = event.clientX - this._lastMouseX
+        // const deltaY = event.clientY - this._lastMouseY
+
+        if (this._baseObject) {
+            this._baseObject.transform.rotation = quat.rotateY(quat.create(), this._baseObject.transform.rotation, glMatrix.toRadian(deltaX * PalletSimulation.rotationSensitivity))
+        }
+
+        // maybe move the camera up and down a little based on the delta-y but clamp between 2 values
+        
+        this._lastMouseX = event.clientX
+        this._lastMouseY = event.clientY
+    }
+
+    public handleMouseUp = (event: MouseEvent) => {
+        this._isDragging = false
     }
 }

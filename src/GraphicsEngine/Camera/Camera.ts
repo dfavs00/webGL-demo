@@ -22,6 +22,10 @@ export class Camera {
     public get projectionMatrix(): mat4 {
         return mat4.clone(this._projectionMatrix)
     }
+    
+    public get transform(): Transform {
+        return this._transform
+    }
 
     public set transform(transform: Transform) {
         this._transform = transform
