@@ -30,8 +30,6 @@ export interface RenderProperties extends ObjectRenderProps {
     modelMatrix: mat4
 }
 
-
-
 export class Renderer {
     private _gl: WebGL2RenderingContext
     private _model: Model
