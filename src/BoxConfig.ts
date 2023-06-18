@@ -73,3 +73,49 @@ export const boxes4x2: Transform[] = [
         vec3.fromValues(boxUnit, boxUnit, boxUnit),
     ),
 ]
+
+
+export const AsymmetricalStack: Transform[] = [
+    // First Tier
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, 0, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, 0, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, 0, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, 0, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    // Second Tier
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, boxUnit + artificialGap, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, boxUnit + artificialGap, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, boxUnit + artificialGap, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, boxUnit + artificialGap, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+]

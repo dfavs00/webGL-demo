@@ -1,6 +1,6 @@
 import { glMatrix, quat, vec3 } from "gl-matrix"
 import { CubeModelData } from "../Assets/Cube"
-import { base, boxes4x2 } from "../BoxConfig"
+import { base } from "../BoxConfig"
 import { LightMaterial } from "./Materials/LightMaterial"
 import { Model } from "./Model"
 import { Object3D } from "./Object3D"
@@ -16,8 +16,7 @@ import { MouseEvent } from "react"
  */
 export class PalletSimulation {
     static readonly rotationSpeed: number = 2.0 // degrees
-    static readonly rotationSensitivity: number = 0.1
-
+    static readonly rotationSensitivity: number = 0.15
 
     private _gl: WebGL2RenderingContext
     private _scene: Scene
@@ -30,16 +29,39 @@ export class PalletSimulation {
     private _lastMouseX: number = 0
     private _lastMouseY: number = 0
 
+    private _selectedBoxIndex: number = 0
+    
+    // materials
+    private _boxMat: LightMaterial
+    private _baseMat: LightMaterial
+    private _highlightMat : LightMaterial
 
-    constructor(gl: WebGL2RenderingContext) {
+    constructor(gl: WebGL2RenderingContext, boxTransforms: Transform[]) {
         this._gl = gl
         this._baseObjectRotation = quat.fromEuler(quat.create(), 0, 45, 0)
         this._baseObject = null
-        this._scene = this.setupScene()
+
+        // create materials
+        const lightBrown = [0.480, 0.368, 0.264, 1.0]
+        this._boxMat = new LightMaterial(this._gl, lightBrown)
+
+        const gray = [0.3, 0.3, 0.4, 1.0]
+        this._baseMat = new LightMaterial(this._gl, gray)
+
+        const lightBlue = [0.48, 0.77, 0.75, 1.0]
+        this._highlightMat = new LightMaterial(this._gl, lightBlue)
+
+        this._scene = this.setupScene(boxTransforms)
         this.render = this.render.bind(this)
+
+        this.setSelectedBoxIndex = this.setSelectedBoxIndex.bind(this)
+        this.setSelectedBoxIndex(0)
     }
 
-    private setupScene(): Scene {
+    private setupScene(boxTransforms: Transform[]): Scene {
+        
+        
+
         // set clear color to black
         this._gl.clearColor(0.0, 0.0, 0.0, 1.0)
 
@@ -47,7 +69,7 @@ export class PalletSimulation {
         this._gl.enable(this._gl.DEPTH_TEST)
 
         // generate the scene objects
-        const sceneObjects = this.createSceneObjects()
+        const sceneObjects = this.createSceneObjects(boxTransforms)
         
         // Create Directional Light
         const lightDirection = vec3.fromValues(0.25, 1.0, 0.5)
@@ -94,19 +116,12 @@ export class PalletSimulation {
         requestAnimationFrame(this.render)
     }
 
-    private createSceneObjects(): Object3D[] {
+    private createSceneObjects(boxTransforms: Transform[]): Object3D[] {
         const sceneObjects: Object3D[] = []
-
         const cubeModel = new Model(CubeModelData)
 
-        const lightBrown = [0.480, 0.368, 0.264, 1.0]
-        const boxRenderer = new Renderer(this._gl, cubeModel,  new LightMaterial(this._gl, lightBrown))
-
-        const gray = [0.3, 0.3, 0.4, 1.0]
-        const baseRenderer = new Renderer(this._gl, cubeModel, new LightMaterial(this._gl, gray))
-
         const boxes: Object3D[] = []
-        boxes4x2.forEach((box: Transform) => {
+        boxTransforms.forEach((box: Transform) => {
             const boxTransform = new Transform(
                 // y position adjustment -> position of the center of the box + half height of base + half height of box, divide this by the scale of the base
                 vec3.fromValues(
@@ -120,12 +135,12 @@ export class PalletSimulation {
                 // This needs to happen because I am using the same 1x1x1 model and scaling them to account for different sizes
                 vec3.fromValues(box.scale[0]/base.scale[0], box.scale[1]/base.scale[1], box.scale[2]/base.scale[2])
             )
-            const boxObj = new Object3D(this._gl, boxRenderer, [], boxTransform)
+            const boxObj = new Object3D(this._gl, new Renderer(this._gl, cubeModel,  this._boxMat), [], boxTransform)
             
             boxes.push(boxObj)
         })
 
-        this._baseObject = new Object3D(this._gl, baseRenderer, boxes, base)
+        this._baseObject = new Object3D(this._gl, new Renderer(this._gl, cubeModel, this._baseMat), boxes, base)
         this._baseObject.transform.rotation = this._baseObjectRotation
 
         sceneObjects.push(this._baseObject)
@@ -172,12 +187,21 @@ export class PalletSimulation {
         }
 
         // maybe move the camera up and down a little based on the delta-y but clamp between 2 values
-        
         this._lastMouseX = event.clientX
         this._lastMouseY = event.clientY
     }
 
+    public handleMouseLeave = (event: MouseEvent) => {
+        this._isDragging = false
+    }
+
     public handleMouseUp = (event: MouseEvent) => {
         this._isDragging = false
+    }
+
+    public setSelectedBoxIndex(index: number) {
+        this._scene.objects[0].getChildByIndex(this._selectedBoxIndex).renderer.material = this._boxMat
+        this._scene.objects[0].getChildByIndex(index).renderer.material = this._highlightMat
+        this._selectedBoxIndex = index
     }
 }

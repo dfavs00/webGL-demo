@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, MouseEvent } from 'react'
 import { PalletSimulation } from './GraphicsEngine/PalletSimulation'
+import { boxes4x2 } from './BoxConfig'
 
 interface RenderComponentProps {
     loading: boolean
@@ -8,6 +9,7 @@ interface RenderComponentProps {
 const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps) => {
     const [canvasHeight, setCanvasHeight] = useState<number>(window.innerHeight)
     const [canvasWidth, setCanvasWidth] = useState<number>(window.innerWidth)
+    const [selectedBoxIndex, setSelectedBoxIndex] = useState<number>(0)
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const palletSimulationRef = useRef<PalletSimulation | null>(null)
@@ -29,6 +31,40 @@ const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps)
             palletSimulationRef.current.handleMouseMove(event)
         }
     }
+
+    // const onResize = (): void => {
+    //     if (palletSimulationRef.current) {
+    //         palletSimulationRef.current.handleResize()
+    //     }
+    // }
+
+    const onMouseLeave = (event: MouseEvent): void => {
+        if (palletSimulationRef.current) {
+            palletSimulationRef.current.handleMouseLeave(event)
+        }
+    }
+
+    const prevBox = (): void => {
+        let newIndex: number
+        if (selectedBoxIndex <= 0) {
+            newIndex = boxes4x2.length - 1
+        } else {
+            newIndex = selectedBoxIndex - 1
+        }
+        palletSimulationRef.current?.setSelectedBoxIndex(newIndex)
+        setSelectedBoxIndex(newIndex)
+    }
+
+    const nextBox = (): void => {
+        let newIndex: number
+        if (selectedBoxIndex >= boxes4x2.length - 1) {
+            newIndex = 0
+        } else {
+            newIndex = selectedBoxIndex + 1
+        }
+        palletSimulationRef.current?.setSelectedBoxIndex(newIndex)
+        setSelectedBoxIndex(newIndex)
+    }   
 
     // handle window resize
     useEffect(() => {
@@ -55,7 +91,7 @@ const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps)
         }
 
         if (!palletSimulationRef.current) {
-            palletSimulationRef.current = new PalletSimulation(gl)
+            palletSimulationRef.current = new PalletSimulation(gl, boxes4x2)
             palletSimulationRef.current?.begin()
         }
 
@@ -64,13 +100,31 @@ const Render: React.FC<RenderComponentProps> = ({loading}: RenderComponentProps)
         }
     }, [])
 
-    return <canvas 
-            ref={canvasRef} 
-            width={canvasWidth} 
-            height={canvasHeight}
-            onMouseMove={onMouseMove}
-            onMouseDown={onMouseDown}
-            onMouseUp={onMouseUp} />
+    return (
+        <div style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
+            <canvas 
+                ref={canvasRef} 
+                width={canvasWidth} 
+                height={canvasHeight}
+                onMouseMove={onMouseMove}
+                onMouseDown={onMouseDown}
+                onMouseUp={onMouseUp} 
+                onMouseLeave={onMouseLeave}
+            />
+            <div>
+                <button
+                    onClick={prevBox}
+                >
+                    Prev
+                </button>
+                <button
+                    onClick={nextBox}
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    )
 }
 
 export default Render

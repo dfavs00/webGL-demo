@@ -38,8 +38,16 @@ export class Object3D {
         
     }
 
+    public getChildByIndex(index: number): Object3D {
+        return this._children[index]
+    }
+
     public get transform(): Transform {
         return this._transform
+    }
+
+    public get renderer(): Renderer {
+        return this._renderer
     }
 
     private setParent(parent: Object3D): void {
