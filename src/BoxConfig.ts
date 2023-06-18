@@ -73,3 +73,28 @@ export const boxes4x2: Transform[] = [
         vec3.fromValues(boxUnit, boxUnit, boxUnit),
     ),
 ]
+
+
+export const AsymmetricalStack: Transform[] = [
+    // First Tier
+    new Transform(
+        vec3.fromValues(0, 0, halfBoxUnit + artificialGap),
+        quat.create(),
+        vec3.fromValues(32, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(-halfBoxUnit - artificialGap, 0, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(halfBoxUnit + artificialGap, 0, -halfBoxUnit - artificialGap),
+        quat.create(),
+        vec3.fromValues(boxUnit, boxUnit, boxUnit),
+    ),
+    new Transform(
+        vec3.fromValues(0, boxUnit + artificialGap, 0),
+        quat.create(),
+        vec3.fromValues(boxUnit, halfBoxUnit, boxUnit),
+    ),
+]

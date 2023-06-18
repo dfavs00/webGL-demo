@@ -30,6 +30,10 @@ export class Scene {
         this._camera = camera
     }
 
+    public get objects(): Object3D[] {
+        return this._objects
+    }
+
     /**
      * @summary Renders all objects in this scene
      */

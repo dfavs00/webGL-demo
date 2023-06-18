@@ -41,6 +41,10 @@ export class Renderer {
         this._material = material
     }
 
+    public set material(mat: Material) {
+        this._material = mat
+    }
+
     /**
      * This function will be called on every render frame
      */
