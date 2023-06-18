@@ -149,8 +149,8 @@ export class PalletSimulation {
     }
 
     public handleResize = () => {
-        const width = window.innerWidth
-        const height = window.innerHeight
+        const width = window.innerWidth / 2
+        const height = window.innerHeight / 1.2
         const canvas = this._gl.canvas
         
         canvas.width = width
